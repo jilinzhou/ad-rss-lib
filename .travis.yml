@@ -49,11 +49,30 @@ matrix:
             - libgtest-dev
             - lcov
       script:
-        - bash .github/.travis/compile.sh debug
-        - rm -rf build
-        - bash .github/.travis/compile.sh release test
+        - bash .github/.travis/compile.sh gcc debug
+        - bash .github/.travis/compile.sh gcc release test
       after_script:
         - bash .github/.travis/code_coverage.sh
+      after_failure:
+        - tail --lines=2000 build.log
+
+    - env: TEST="Check compiler matrix for Ubuntu 16.04"
+      addons:
+        apt:
+          packages:
+            - cmake
+            - build-essential
+            - libgtest-dev
+      before_install:
+        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        - sudo apt-get update -q
+        - sudo apt-get install clang-6.0 clang-5.0 g++-7 g++-4.8
+      script:
+        - bash .github/.travis/compile.sh gcc release test
+        - bash .github/.travis/compile.sh gcc-5 release test
+        - bash .github/.travis/compile.sh gcc-4 release test
+        - bash .github/.travis/compile.sh clang-6 release test
+        - bash .github/.travis/compile.sh clang-5 release test
       after_failure:
         - tail --lines=2000 build.log
 
@@ -67,7 +86,7 @@ matrix:
             - build-essential
             - libgtest-dev
       script:
-        - bash .github/.travis/compile.sh release
+        - bash .github/.travis/compile.sh gcc release test
       after_failure:
         - tail --lines=2000 build.log
 

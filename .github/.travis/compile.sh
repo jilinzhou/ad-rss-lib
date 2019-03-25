@@ -32,12 +32,47 @@
 # ----------------- END LICENSE BLOCK -----------------------------------
 ##
 
+rm -rf build
+
 mkdir build
 cd build
 
-if [ "$1" == "release" ]; then
+if [ "$1" == "gcc" ]; then
+  version=`gcc --version | grep "gcc" | awk '{ print $4}'`
+  echo "Using gcc $version"
+elif [ "$1" == "gcc-4" ]; then
+  version=`/usr/bin/gcc-4.8 --version | grep "gcc" | awk '{ print $4}'`
+  echo "Using gcc $version"
+  export CC=/usr/bin/gcc-4.8
+  export CXX=/usr/bin/g++-4.8
+elif [ "$1" == "gcc-5" ]; then
+  version=`/usr/bin/gcc-5 --version | grep "gcc" | awk '{ print $4}'`
+  echo "Using gcc $version"
+  export CC=/usr/bin/gcc-5
+  export CXX=/usr/bin/g++-5
+elif [ "$1" == "gcc-7" ]; then
+  version=`/usr/bin/gcc-7 --version | grep "gcc" | awk '{ print $4}'`
+  echo "Using gcc $version"
+  export CC=/usr/bin/gcc-7
+  export CXX=/usr/bin/g++-7
+elif [ "$1" == "clang-5" ]; then
+  version=`gcc --version | grep "clang" | awk '{ print $3}'`
+  echo "Using clang $version"
+  export CC=/usr/bin/clang-5
+  export CXX=/usr/bin/clang++-5
+elif [ "$1" == "clang-6" ]; then
+  version=`gcc --version | grep "clang" | awk '{ print $3}'`
+  echo "Using clang $version"
+  export CC=/usr/bin/clang-6
+  export CXX=/usr/bin/clang++-6
+else
+  echo "Unsupported compiler"
+  exit 1
+fi
+
+if [ "$2" == "release" ]; then
   cmake .. -DBUILD_HARDENING=ON -DBUILD_COVERAGE=ON
-elif [ "$1" == "debug" ]; then
+elif [ "$2" == "debug" ]; then
   cmake .. -DBUILD_HARDENING=ON -DBUILD_COVERAGE=ON -DCMAKE_BUILD_TYPE=DEBUG
 else
   echo "Unsupported mode"
@@ -46,7 +81,7 @@ fi
 
 make
 
-if [ "$2" == "test" ]; then
+if [ "$3" == "test" ]; then
   ctest -V
 fi
 
